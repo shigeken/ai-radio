@@ -7,129 +7,89 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700;900&family=Share+Tech+Mono&display=swap');
   :root {
-    --bg: #0a0a0f; --surface: #13131a; --border: #2a2a3a;
-    --accent: #ff4d6d; --accent2: #7b61ff; --text: #e8e8f0; --muted: #666680;
+    --bg:#0a0a0f;--surface:#13131a;--border:#2a2a3a;
+    --accent:#ff4d6d;--accent2:#7b61ff;--text:#e8e8f0;--muted:#666680;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: var(--bg); color: var(--text);
-    font-family: 'Zen Kaku Gothic New', sans-serif;
-    min-height: 100vh; display: flex; flex-direction: column;
-    align-items: center; padding: 24px 16px;
-  }
-  .header { text-align: center; margin-bottom: 28px; }
-  .station-label {
-    font-family: 'Share Tech Mono', monospace; font-size: 11px;
-    letter-spacing: 4px; color: var(--accent); text-transform: uppercase; margin-bottom: 8px;
-  }
-  h1 { font-size: clamp(32px, 8vw, 52px); font-weight: 900; letter-spacing: -1px; }
-  h1 span { color: var(--accent); }
-  .tagline { color: var(--muted); font-size: 13px; margin-top: 6px; }
-  .card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 20px; padding: 24px 20px;
-    width: 100%; max-width: 480px; margin-bottom: 16px;
-  }
-  .section-label {
-    font-family: 'Share Tech Mono', monospace; font-size: 10px;
-    letter-spacing: 3px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px;
-  }
-  input {
-    width: 100%; background: var(--bg); border: 1px solid var(--border);
-    border-radius: 10px; color: var(--text); font-family: 'Zen Kaku Gothic New', sans-serif;
-    font-size: 14px; padding: 12px 14px; outline: none; transition: border-color 0.2s; -webkit-appearance: none;
-  }
-  input:focus { border-color: var(--accent2); }
-  input[type="password"] { font-family: 'Share Tech Mono', monospace; letter-spacing: 2px; }
-  .key-saved {
-    display: flex; align-items: center; justify-content: space-between;
-    background: rgba(123,97,255,0.1); border: 1px solid rgba(123,97,255,0.3);
-    border-radius: 10px; padding: 10px 14px; font-size: 13px; color: var(--accent2);
-  }
-  .key-saved button {
-    background: transparent; border: none; color: var(--muted);
-    cursor: pointer; font-size: 12px; text-decoration: underline;
-  }
-  .divider { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
-  .btn-main {
-    width: 100%; border: none; border-radius: 14px; color: white; cursor: pointer;
-    font-family: 'Zen Kaku Gothic New', sans-serif; font-size: 18px; font-weight: 900;
-    padding: 20px; letter-spacing: 2px; transition: all 0.2s; background: var(--accent);
-  }
-  .btn-main:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255,77,109,0.5); }
-  .btn-main:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-  .btn-stop {
-    width: 100%; background: transparent; border: 1px solid var(--border);
-    border-radius: 14px; color: var(--muted); cursor: pointer;
-    font-family: 'Zen Kaku Gothic New', sans-serif; font-size: 15px; font-weight: 700;
-    padding: 14px; margin-top: 10px; transition: all 0.2s;
-  }
-  .btn-stop:hover { border-color: var(--accent); color: var(--accent); }
-  .now-playing {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 20px; padding: 24px 20px;
-    width: 100%; max-width: 480px; margin-bottom: 16px; display: none;
-  }
-  .now-playing.visible { display: block; }
-  .waveform { display: flex; align-items: center; gap: 3px; height: 32px; margin-bottom: 16px; }
-  .bar { width: 3px; border-radius: 2px; animation: wave 1s ease-in-out infinite; opacity: 0.3; }
-  .bar.talk { background: var(--accent); }
-  .bar.cm { background: #ffd700; }
-  .bar.active { opacity: 1; }
-  @keyframes wave { 0%,100%{height:4px} 50%{height:24px} }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Zen Kaku Gothic New',sans-serif;
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:24px 16px}
+  .header{text-align:center;margin-bottom:28px}
+  .station-label{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;
+    color:var(--accent);text-transform:uppercase;margin-bottom:8px}
+  h1{font-size:clamp(32px,8vw,52px);font-weight:900;letter-spacing:-1px}
+  h1 span{color:var(--accent)}
+  .tagline{color:var(--muted);font-size:13px;margin-top:6px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:20px;
+    padding:24px 20px;width:100%;max-width:480px;margin-bottom:16px}
+  .section-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;
+    color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+  input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;
+    color:var(--text);font-family:'Zen Kaku Gothic New',sans-serif;font-size:14px;
+    padding:12px 14px;outline:none;transition:border-color .2s;-webkit-appearance:none}
+  input:focus{border-color:var(--accent2)}
+  input[type="password"]{font-family:'Share Tech Mono',monospace;letter-spacing:2px}
+  .key-saved{display:flex;align-items:center;justify-content:space-between;
+    background:rgba(123,97,255,.1);border:1px solid rgba(123,97,255,.3);
+    border-radius:10px;padding:10px 14px;font-size:13px;color:var(--accent2)}
+  .key-saved button{background:transparent;border:none;color:var(--muted);
+    cursor:pointer;font-size:12px;text-decoration:underline}
+  .divider{border:none;border-top:1px solid var(--border);margin:18px 0}
+  .btn-main{width:100%;border:none;border-radius:14px;color:#fff;cursor:pointer;
+    font-family:'Zen Kaku Gothic New',sans-serif;font-size:18px;font-weight:900;
+    padding:20px;letter-spacing:2px;transition:all .2s;background:var(--accent)}
+  .btn-main:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 28px rgba(255,77,109,.5)}
+  .btn-main:disabled{opacity:.4;cursor:not-allowed;transform:none}
+  .btn-stop{width:100%;background:transparent;border:1px solid var(--border);
+    border-radius:14px;color:var(--muted);cursor:pointer;
+    font-family:'Zen Kaku Gothic New',sans-serif;font-size:15px;font-weight:700;
+    padding:14px;margin-top:10px;transition:all .2s}
+  .btn-stop:hover{border-color:var(--accent);color:var(--accent)}
+  .now-playing{background:var(--surface);border:1px solid var(--border);
+    border-radius:20px;padding:24px 20px;width:100%;max-width:480px;
+    margin-bottom:16px;display:none}
+  .now-playing.visible{display:block}
+  .waveform{display:flex;align-items:center;gap:3px;height:32px;margin-bottom:16px}
+  .bar{width:3px;border-radius:2px;animation:wave 1s ease-in-out infinite;opacity:.3}
+  .bar.talk{background:var(--accent)}.bar.cm{background:#ffd700}.bar.active{opacity:1}
+  @keyframes wave{0%,100%{height:4px}50%{height:24px}}
   .bar:nth-child(1){animation-delay:0s}.bar:nth-child(2){animation-delay:.1s}
   .bar:nth-child(3){animation-delay:.2s}.bar:nth-child(4){animation-delay:.3s}
   .bar:nth-child(5){animation-delay:.4s}.bar:nth-child(6){animation-delay:.3s}
   .bar:nth-child(7){animation-delay:.2s}.bar:nth-child(8){animation-delay:.1s}
   .bar:nth-child(9){animation-delay:0s}
-  .mode-badge {
-    display: inline-block; border-radius: 20px; font-size: 12px; font-weight: 700;
-    padding: 4px 12px; margin-bottom: 12px; letter-spacing: 1px;
-  }
-  .mode-talk { background: rgba(255,77,109,0.2); color: var(--accent); }
-  .mode-cm { background: rgba(255,215,0,0.2); color: #ffd700; }
-  .mode-loading { background: rgba(123,97,255,0.2); color: var(--accent2); }
-  .current-theme { font-size: 15px; font-weight: 700; margin-bottom: 16px; color: var(--text); }
-  .chat-log {
-    display: flex; flex-direction: column; gap: 10px;
-    margin-bottom: 16px; max-height: 350px; overflow-y: auto;
-  }
-  .chat-bubble { display: flex; gap: 10px; align-items: flex-start; }
-  .chat-bubble.right { flex-direction: row-reverse; }
-  .bubble-avatar { font-size: 22px; flex-shrink: 0; width: 32px; text-align: center; }
-  .bubble-content { max-width: 82%; }
-  .bubble-name { font-size: 11px; font-weight: 700; margin-bottom: 3px; }
-  .chat-bubble.left .bubble-name { color: var(--accent); }
-  .chat-bubble.right .bubble-name { color: var(--accent2); text-align: right; }
-  .bubble-text {
-    background: var(--bg); border-radius: 12px; font-size: 14px;
-    line-height: 1.7; padding: 10px 13px; border: 1px solid var(--border);
-  }
-  .chat-bubble.left .bubble-text { border-color: rgba(255,77,109,0.3); border-top-left-radius: 3px; }
-  .chat-bubble.right .bubble-text { border-color: rgba(123,97,255,0.3); border-top-right-radius: 3px; }
-  .bubble-text.speaking { background: rgba(255,255,255,0.06); }
-  .cm-box {
-    background: rgba(255,215,0,0.07); border: 1px solid rgba(255,215,0,0.3);
-    border-radius: 12px; padding: 14px; font-size: 14px; line-height: 1.7;
-    margin-bottom: 16px; display: none; color: #ffe566;
-  }
-  .cm-box.visible { display: block; }
-  .bgm-indicator {
-    display: flex; align-items: center; gap: 8px;
-    font-family: 'Share Tech Mono', monospace; font-size: 11px;
-    color: var(--muted); margin-top: 12px;
-  }
-  .bgm-dot {
-    width: 6px; height: 6px; border-radius: 50%; background: var(--accent2);
-    animation: pulse 1.5s ease-in-out infinite;
-  }
-  .bgm-dot.off { background: var(--muted); animation: none; opacity: 0.3; }
-  @keyframes pulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
-  .status {
-    font-family: 'Share Tech Mono', monospace; font-size: 11px;
-    color: var(--muted); text-align: center; margin-top: 10px; min-height: 16px;
-  }
-  .status.error { color: var(--accent); }
+  .mode-badge{display:inline-block;border-radius:20px;font-size:12px;font-weight:700;
+    padding:4px 12px;margin-bottom:12px;letter-spacing:1px}
+  .mode-talk{background:rgba(255,77,109,.2);color:var(--accent)}
+  .mode-cm{background:rgba(255,215,0,.2);color:#ffd700}
+  .mode-loading{background:rgba(123,97,255,.2);color:var(--accent2)}
+  .current-theme{font-size:15px;font-weight:700;margin-bottom:16px;color:var(--text)}
+  .chat-log{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;
+    max-height:350px;overflow-y:auto}
+  .chat-bubble{display:flex;gap:10px;align-items:flex-start}
+  .chat-bubble.right{flex-direction:row-reverse}
+  .bubble-avatar{font-size:22px;flex-shrink:0;width:32px;text-align:center}
+  .bubble-content{max-width:82%}
+  .bubble-name{font-size:11px;font-weight:700;margin-bottom:3px}
+  .chat-bubble.left .bubble-name{color:var(--accent)}
+  .chat-bubble.right .bubble-name{color:var(--accent2);text-align:right}
+  .bubble-text{background:var(--bg);border-radius:12px;font-size:14px;
+    line-height:1.7;padding:10px 13px;border:1px solid var(--border)}
+  .chat-bubble.left .bubble-text{border-color:rgba(255,77,109,.3);border-top-left-radius:3px}
+  .chat-bubble.right .bubble-text{border-color:rgba(123,97,255,.3);border-top-right-radius:3px}
+  .bubble-text.speaking{background:rgba(255,255,255,.06)}
+  .cm-box{background:rgba(255,215,0,.07);border:1px solid rgba(255,215,0,.3);
+    border-radius:12px;padding:14px;font-size:14px;line-height:1.7;
+    margin-bottom:16px;display:none;color:#ffe566}
+  .cm-box.visible{display:block}
+  .bgm-indicator{display:flex;align-items:center;gap:8px;
+    font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);margin-top:12px}
+  .bgm-dot{width:6px;height:6px;border-radius:50%;background:var(--accent2);
+    animation:pulse 1.5s ease-in-out infinite}
+  .bgm-dot.off{background:var(--muted);animation:none;opacity:.3}
+  @keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
+  .status{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);
+    text-align:center;margin-top:10px;min-height:16px}
+  .status.error{color:var(--accent)}
 </style>
 </head>
 <body>
@@ -140,19 +100,17 @@
   <div class="tagline">エンドレスラジオ — 止まるまで流れ続ける</div>
 </div>
 
-<div class="card" id="setupCard">
-  <div id="apiKeyGroup">
-    <div class="section-label">🔑 API キー</div>
-    <div id="keySavedBanner" class="key-saved" style="display:none">
-      <span>✅ APIキー保存済み</span>
-      <button onclick="clearKey()">削除して再入力</button>
-    </div>
-    <div id="keyInputArea">
-      <input type="password" id="apiKey" placeholder="sk-ant-api..." autocomplete="off">
-      <div style="margin-top:8px;display:flex;gap:8px;align-items:center;">
-        <input type="checkbox" id="saveKey" checked style="width:auto;padding:0;accent-color:var(--accent2)">
-        <label for="saveKey" style="font-size:12px;color:var(--muted);cursor:pointer">このデバイスに保存する</label>
-      </div>
+<div class="card">
+  <div class="section-label">🔑 API キー</div>
+  <div id="keySavedBanner" class="key-saved" style="display:none">
+    <span>✅ APIキー保存済み</span>
+    <button onclick="clearKey()">削除して再入力</button>
+  </div>
+  <div id="keyInputArea">
+    <input type="password" id="apiKey" placeholder="sk-ant-api..." autocomplete="off">
+    <div style="margin-top:8px;display:flex;gap:8px;align-items:center;">
+      <input type="checkbox" id="saveKey" checked style="width:auto;padding:0;accent-color:var(--accent2)">
+      <label for="saveKey" style="font-size:12px;color:var(--muted);cursor:pointer">このデバイスに保存する</label>
     </div>
   </div>
   <hr class="divider">
@@ -163,11 +121,9 @@
 <div class="now-playing" id="nowPlaying">
   <div class="section-label">📡 オンエア中</div>
   <div class="waveform">
-    <div class="bar talk" id="b1"></div><div class="bar talk" id="b2"></div>
-    <div class="bar talk" id="b3"></div><div class="bar talk" id="b4"></div>
-    <div class="bar talk" id="b5"></div><div class="bar talk" id="b6"></div>
-    <div class="bar talk" id="b7"></div><div class="bar talk" id="b8"></div>
-    <div class="bar talk" id="b9"></div>
+    <div class="bar talk"></div><div class="bar talk"></div><div class="bar talk"></div>
+    <div class="bar talk"></div><div class="bar talk"></div><div class="bar talk"></div>
+    <div class="bar talk"></div><div class="bar talk"></div><div class="bar talk"></div>
   </div>
   <div class="mode-badge mode-loading" id="modeBadge">⏳ 準備中</div>
   <div class="current-theme" id="currentTheme"></div>
@@ -181,36 +137,30 @@
 </div>
 
 <script>
-// ===== 定数 =====
+// ===== DJ定義（4人）=====
 const DJS = {
-  a: { name: 'ハル',   emoji: '😄', pitch: 1.2,  rate: 1.0,  desc: '明るくテンション高め。話を広げるのが得意。' },
-  b: { name: 'ソラ',   emoji: '🤓', pitch: 0.85, rate: 0.95, desc: '冷静で知識豊富。ツッコミ担当。' },
-  c: { name: 'ナナ',   emoji: '😎', pitch: 1.3,  rate: 1.1,  desc: 'トレンド大好きギャル系。話が脱線しがち。テンションが読めない。' },
-  d: { name: 'ジョージ', emoji: '🧓', pitch: 0.75, rate: 0.88, desc: '昭和のおじさんDJ。古いたとえ話が多く若者文化についていけないが人情味がある。' }
+  a: { name:'ハル',   emoji:'😄', pitch:1.2,  rate:1.0,  desc:'明るくテンション高め。話を広げるのが得意。' },
+  b: { name:'ソラ',   emoji:'🤓', pitch:0.85, rate:0.95, desc:'冷静で知識豊富。ツッコミ担当。' },
+  c: { name:'ナナ',   emoji:'😎', pitch:1.3,  rate:1.1,  desc:'トレンド大好きギャル系。話が脱線しがち。テンションが読めない。' },
+  d: { name:'ジョージ',emoji:'🧓', pitch:0.75, rate:0.88, desc:'昭和のおじさんDJ。古いたとえ話が多く若者文化についていけないが人情味がある。' }
 };
 
-// ランダムで2人選ぶ
 function pickDJs() {
   const keys = Object.keys(DJS);
-  const shuffled = keys.sort(() => Math.random() - 0.5);
-  return [shuffled[0], shuffled[1]];
+  for (let i = keys.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [keys[i], keys[j]] = [keys[j], keys[i]];
+  }
+  return [keys[0], keys[1]];
 }
 
-// テーマはAIが生成（固定リストなし）
-async function fetchTheme() {
-  const useNews = Math.random() < 0.3; // 30%の確率でニュース系
-  const prompt = useNews
-    ? `あなたはラジオ番組のプロデューサーです。最近の日本や世界のニュース・トレンドを踏まえて、ラジオトークのテーマを1つ考えてください。テーマの文章のみ出力してください（例：最近話題の○○について）。説明不要。`
-    : `あなたはラジオ番組のプロデューサーです。リスナーが楽しめる面白いラジオトークのテーマを1つ考えてください。日常・文化・雑学・人生・トレンドなど何でもOK。テーマの文章のみ出力してください（例：○○について）。説明不要。毎回違うテーマにしてください。`;
-  return await callAPI(prompt, 100);
-}
-
+// ===== BGMパターン =====
 const BGM_PATTERNS = [
-  { notes: [261.6,311.1,369.9,415.3], type: 'sine', interval: 1.0, vol: 0.03 },
-  { notes: [329.6,392.0,440.0,523.2], type: 'triangle', interval: 0.7, vol: 0.025 },
-  { notes: [220.0,246.9,277.2,329.6], type: 'sine', interval: 1.3, vol: 0.035 },
-  { notes: [349.2,392.0,440.0,493.8], type: 'triangle', interval: 0.6, vol: 0.025 },
-  { notes: [196.0,220.0,261.6,293.6], type: 'sine', interval: 1.1, vol: 0.03 }
+  { notes:[261.6,311.1,369.9,415.3], type:'sine',     interval:1.0, vol:0.03  },
+  { notes:[329.6,392.0,440.0,523.2], type:'triangle', interval:0.7, vol:0.025 },
+  { notes:[220.0,246.9,277.2,329.6], type:'sine',     interval:1.3, vol:0.035 },
+  { notes:[349.2,392.0,440.0,493.8], type:'triangle', interval:0.6, vol:0.025 },
+  { notes:[196.0,220.0,261.6,293.6], type:'sine',     interval:1.1, vol:0.03  }
 ];
 
 // ===== 状態 =====
@@ -249,10 +199,7 @@ function clearKey() {
 }
 
 function getApiKey() {
-  try {
-    const s = localStorage.getItem('ai_radio_key');
-    if (s) return s;
-  } catch(e) {}
+  try { const s = localStorage.getItem('ai_radio_key'); if (s) return s; } catch(e) {}
   return document.getElementById('apiKey').value.trim();
 }
 
@@ -263,7 +210,7 @@ function setStatus(msg, isError) {
 }
 
 // ===== BGM =====
-function pickBgmPattern() {
+function pickBgm() {
   let idx;
   do { idx = Math.floor(Math.random() * BGM_PATTERNS.length); }
   while (idx === lastBgmIdx && BGM_PATTERNS.length > 1);
@@ -274,13 +221,11 @@ function pickBgmPattern() {
 function bgmTick(pattern) {
   if (!bgmOn || !audioCtx) return;
   const now = audioCtx.currentTime;
-  const count = 8;
-  for (let i = 0; i < count; i++) {
+  for (let i = 0; i < 8; i++) {
     try {
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
+      osc.connect(gain); gain.connect(audioCtx.destination);
       const note = pattern.notes[Math.floor(Math.random() * pattern.notes.length)];
       osc.frequency.value = note * (Math.random() > 0.5 ? 1 : 0.5);
       osc.type = pattern.type;
@@ -289,13 +234,11 @@ function bgmTick(pattern) {
       gain.gain.setValueAtTime(0, s);
       gain.gain.linearRampToValueAtTime(pattern.vol, s + 0.3);
       gain.gain.linearRampToValueAtTime(0, s + d);
-      osc.start(s);
-      osc.stop(s + d);
+      osc.start(s); osc.stop(s + d);
       bgmNodes.push(osc);
     } catch(e) {}
   }
-  const ms = count * pattern.interval * 1000;
-  bgmLoopTimer = setTimeout(() => bgmTick(pattern), ms - 300);
+  bgmLoopTimer = setTimeout(() => bgmTick(pattern), 8 * pattern.interval * 1000 - 300);
 }
 
 function startBGM() {
@@ -303,9 +246,9 @@ function startBGM() {
   try {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     bgmOn = true;
-    setBgmIndicator(true);
-    bgmTick(pickBgmPattern());
-  } catch(e) { console.log('BGM err', e); }
+    setBgmUI(true);
+    bgmTick(pickBgm());
+  } catch(e) {}
 }
 
 function stopBGM() {
@@ -313,26 +256,14 @@ function stopBGM() {
   if (bgmLoopTimer) { clearTimeout(bgmLoopTimer); bgmLoopTimer = null; }
   bgmNodes.forEach(n => { try { n.stop(); } catch(e){} });
   bgmNodes = [];
-  setBgmIndicator(false);
+  setBgmUI(false);
 }
 
-function restartBGM() {
-  stopBGM();
-  bgmOn = true;
-  setBgmIndicator(true);
-  bgmTick(pickBgmPattern());
-}
-
-function setBgmIndicator(on) {
+function setBgmUI(on) {
   const dot = document.getElementById('bgmDot');
   const label = document.getElementById('bgmLabel');
-  if (on) {
-    dot.classList.remove('off');
-    label.textContent = 'BGM 再生中';
-  } else {
-    dot.classList.add('off');
-    label.textContent = 'BGM 停止中';
-  }
+  if (on) { dot.classList.remove('off'); label.textContent = 'BGM 再生中'; }
+  else     { dot.classList.add('off');    label.textContent = 'BGM 停止中'; }
 }
 
 // ===== API呼び出し =====
@@ -351,20 +282,29 @@ async function callAPI(prompt, maxTokens) {
       messages: [{ role: 'user', content: prompt }]
     })
   });
-  if (!res.ok) {
-    const e = await res.json();
-    throw new Error(e.error?.message || 'APIエラー');
-  }
+  if (!res.ok) { const e = await res.json(); throw new Error(e.error?.message || 'APIエラー'); }
   const data = await res.json();
   return data.content[0].text.trim();
 }
 
-async function fetchScript(theme) {
-  const text = await callAPI(
+// ===== テーマ生成 =====
+async function fetchTheme() {
+  const useNews = Math.random() < 0.3;
+  const prompt = useNews
+    ? 'あなたはラジオ番組のプロデューサーです。最近の日本や世界のニュース・トレンドを踏まえて、ラジオトークのテーマを1つ考えてください。テーマの文章のみ出力してください（例：最近話題の○○について）。説明不要。'
+    : 'あなたはラジオ番組のプロデューサーです。リスナーが楽しめる面白いラジオトークのテーマを1つ考えてください。日常・文化・雑学・人生・トレンドなど何でもOK。テーマの文章のみ出力してください（例：○○について）。説明不要。毎回違うテーマにしてください。';
+  return await callAPI(prompt, 100);
+}
+
+// ===== 台本生成 =====
+async function fetchScript(theme, djKeyA, djKeyB) {
+  const djA = DJS[djKeyA];
+  const djB = DJS[djKeyB];
+  const raw = await callAPI(
     `あなたはラジオ番組の台本作家です。2人のDJが会話するラジオ番組の台本を作ってください。
 
-DJ A「ハル」: 明るくテンション高め。話を広げるのが得意。
-DJ B「ソラ」: 冷静で知識豊富。ツッコミ担当。
+DJ A「${djA.name}」: ${djA.desc}
+DJ B「${djB.name}」: ${djB.desc}
 
 テーマ：${theme}
 
@@ -372,6 +312,7 @@ DJ B「ソラ」: 冷静で知識豊富。ツッコミ担当。
 - 全部で40〜50回のやり取り（約15分分）
 - 各セリフは1〜3文
 - 挨拶から始まり、テーマを深掘りしながら自然に盛り上がり、最後に締める
+- 各DJのキャラクターを活かした自然な会話にする
 
 【出力形式】この形式のみ：
 A:セリフ
@@ -384,14 +325,15 @@ A:セリフ
   );
 
   const lines = [];
-  text.split('\n').forEach(line => {
+  raw.split('\n').forEach(line => {
     const t = line.trim();
-    if (t.startsWith('A:')) lines.push({ dj: keyA, text: t.slice(2).trim() });
-    else if (t.startsWith('B:')) lines.push({ dj: keyB, text: t.slice(2).trim() });
+    if (t.startsWith('A:')) lines.push({ djKey: djKeyA, text: t.slice(2).trim() });
+    else if (t.startsWith('B:')) lines.push({ djKey: djKeyB, text: t.slice(2).trim() });
   });
-  return { theme, lines, djKeys };
+  return { theme, lines, djKeyA, djKeyB };
 }
 
+// ===== CM生成 =====
 async function fetchCM() {
   const types = ['食品','アプリ','旅行','健康食品','家電','カフェ','スポーツジム','美容'];
   const type = types[Math.floor(Math.random() * types.length)];
@@ -405,14 +347,11 @@ async function fetchCM() {
 function speak(text, djKey) {
   return new Promise(resolve => {
     synth.cancel();
-    const dj = DJS[djKey] || { pitch: 1.0, rate: 1.0 };
+    const dj = djKey ? DJS[djKey] : { pitch: 1.0, rate: 1.0 };
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'ja-JP';
-    u.pitch = dj.pitch;
-    u.rate = dj.rate;
+    u.lang = 'ja-JP'; u.pitch = dj.pitch; u.rate = dj.rate;
     if (voices.length > 0) u.voice = voices[0];
-    u.onend = resolve;
-    u.onerror = resolve;
+    u.onend = resolve; u.onerror = resolve;
     synth.speak(u);
   });
 }
@@ -420,17 +359,17 @@ function speak(text, djKey) {
 function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 // ===== UI =====
-function setMode(mode, theme, djKeys) {
+function setMode(mode, data) {
   const badge = document.getElementById('modeBadge');
   const bars = document.querySelectorAll('.bar');
   bars.forEach(b => b.classList.remove('talk','cm','active'));
 
   if (mode === 'talk') {
-    const djLabel = djKeys ? djKeys.map(k => DJS[k].emoji + DJS[k].name).join(' × ') : '';
-    badge.textContent = `🎙️ ${djLabel}`;
+    const label = DJS[data.djKeyA].emoji + DJS[data.djKeyA].name + ' × ' + DJS[data.djKeyB].emoji + DJS[data.djKeyB].name;
+    badge.textContent = '🎙️ ' + label;
     badge.className = 'mode-badge mode-talk';
     bars.forEach(b => { b.classList.add('talk','active'); });
-    document.getElementById('currentTheme').textContent = `📌 ${theme}`;
+    document.getElementById('currentTheme').textContent = '📌 ' + data.theme;
     document.getElementById('cmBox').classList.remove('visible');
     document.getElementById('chatLog').style.display = 'flex';
   } else if (mode === 'cm') {
@@ -447,14 +386,14 @@ function setMode(mode, theme, djKeys) {
   }
 }
 
-function renderChat(lines) {
+function renderChat(script) {
   const log = document.getElementById('chatLog');
   log.innerHTML = '';
-  lines.forEach((line, i) => {
-    const dj = DJS[line.dj];
-    const side = line.dj === 'a' ? 'left' : 'right';
+  script.lines.forEach((line, i) => {
+    const dj = DJS[line.djKey];
+    const side = line.djKey === script.djKeyA ? 'left' : 'right';
     const div = document.createElement('div');
-    div.className = `chat-bubble ${side}`;
+    div.className = 'chat-bubble ' + side;
     div.innerHTML = `
       <div class="bubble-avatar">${dj.emoji}</div>
       <div class="bubble-content">
@@ -467,50 +406,48 @@ function renderChat(lines) {
 
 function highlight(idx) {
   document.querySelectorAll('.bubble-text').forEach(el => el.classList.remove('speaking'));
-  const el = document.getElementById(`line-${idx}`);
-  if (el) { el.classList.add('speaking'); el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+  const el = document.getElementById('line-' + idx);
+  if (el) { el.classList.add('speaking'); el.scrollIntoView({ behavior:'smooth', block:'nearest' }); }
 }
 
 // ===== メインループ =====
 async function radioLoop() {
-  const randomTheme = () => THEMES[Math.floor(Math.random() * THEMES.length)];
-
-  setMode('loading', '', null);
+  setMode('loading', {});
   setStatus('最初の台本を生成中（10〜20秒かかります）...', false);
 
   let current;
   try {
-    const firstTheme = await fetchTheme();
-    const firstDJs = pickDJs();
-    current = await fetchScript(firstTheme, firstDJs);
+    const theme = await fetchTheme();
+    const [keyA, keyB] = pickDJs();
+    current = await fetchScript(theme, keyA, keyB);
   } catch(e) {
     setStatus('エラー: ' + e.message, true);
-    stopRadio();
-    return;
+    stopRadio(); return;
   }
 
   while (isRunning) {
-    // トークパート開始
-    setMode('talk', current.theme, current.djKeys);
-    renderChat(current.lines);
+    // トークパート
+    setMode('talk', current);
+    renderChat(current);
     startBGM();
 
-    // 台本読み上げと並行してCM・次台本を取得
+    // 裏でCMと次の台本を準備
     const cmPromise = fetchCM().catch(() => '提供：AIラジオスタジオ。いつもご愛聴ありがとうございます。');
     const nextPromise = (async () => {
-      const nextTheme = await fetchTheme();
-      const nextDJs = pickDJs();
-      return fetchScript(nextTheme, nextDJs);
+      const theme = await fetchTheme();
+      const [keyA, keyB] = pickDJs();
+      return await fetchScript(theme, keyA, keyB);
     })().catch(async () => {
       await wait(3000);
-      const t = await fetchTheme();
-      return fetchScript(t, pickDJs());
+      const theme = await fetchTheme();
+      const [keyA, keyB] = pickDJs();
+      return await fetchScript(theme, keyA, keyB);
     });
 
     for (let i = 0; i < current.lines.length; i++) {
       if (!isRunning) return;
       highlight(i);
-      await speak(current.lines[i].text, current.lines[i].dj);
+      await speak(current.lines[i].text, current.lines[i].djKey);
       await wait(180);
     }
 
@@ -518,12 +455,10 @@ async function radioLoop() {
 
     // CMパート
     stopBGM();
-    setMode('cm', '', null);
-
+    setMode('cm', {});
     let cmText;
     try { cmText = await cmPromise; } catch(e) { cmText = 'AIラジオをお聴きいただきありがとうございます。'; }
     document.getElementById('cmBox').textContent = cmText;
-
     await speak('それではCMです。', 'a');
     await wait(150);
     await speak(cmText, null);
@@ -533,8 +468,7 @@ async function radioLoop() {
 
     if (!isRunning) return;
 
-    // 次の台本を待つ
-    setMode('loading', '', null);
+    setMode('loading', {});
     setStatus('次の台本を準備中...', false);
     try { current = await nextPromise; } catch(e) {
       setStatus('エラー: ' + e.message, true);
@@ -547,7 +481,6 @@ async function radioLoop() {
 async function startRadio() {
   const apiKey = getApiKey();
   if (!apiKey) { setStatus('APIキーを入力してください', true); return; }
-
   try {
     if (document.getElementById('saveKey')?.checked) {
       localStorage.setItem('ai_radio_key', apiKey);
@@ -555,13 +488,38 @@ async function startRadio() {
       document.getElementById('keyInputArea').style.display = 'none';
     }
   } catch(e) {}
-
   isRunning = true;
   document.getElementById('startBtn').disabled = true;
   document.getElementById('nowPlaying').classList.add('visible');
-
   await radioLoop();
 }
 
 function stopRadio() {
-  isRunning = 
+  isRunning = false;
+  synth.cancel();
+  stopBGM();
+  if (audioCtx) { try { audioCtx.close(); } catch(e){} audioCtx = null; }
+  document.getElementById('nowPlaying').classList.remove('visible');
+  document.getElementById('startBtn').disabled = false;
+  setStatus('放送を終了しました', false);
+}
+
+// 画面オフ防止
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      await navigator.wakeLock.request('screen');
+      document.addEventListener('visibilitychange', async () => {
+        if (document.visibilityState === 'visible') {
+          try { await navigator.wakeLock.request('screen'); } catch(e) {}
+        }
+      });
+    }
+  } catch(e) {}
+}
+
+loadKey();
+requestWakeLock();
+</script>
+</body>
+</html>
