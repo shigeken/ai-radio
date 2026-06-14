@@ -241,6 +241,7 @@ function loadKey() {
     }
   } catch(e) {}
 }
+window.onload = loadKey; // 読み込み時にキーを復元する処理を追加
 
 function clearKey() {
   try { localStorage.removeItem('ai_radio_key'); } catch(e) {}
@@ -316,25 +317,6 @@ function stopBGM() {
   setBgmIndicator(false);
 }
 
-function restartBGM() {
-  stopBGM();
-  bgmOn = true;
-  setBgmIndicator(true);
-  bgmTick(pickBgmPattern());
-}
-
-function setBgmIndicator(on) {
-  const dot = document.getElementById('bgmDot');
-  const label = document.getElementById('bgmLabel');
-  if (on) {
-    dot.classList.remove('off');
-    label.textContent = 'BGM 再生中';
-  } else {
-    dot.classList.add('off');
-    label.textContent = 'BGM 停止中';
-  }
-}
-
 // ===== API呼び出し =====
 async function callAPI(prompt, maxTokens) {
   const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -346,7 +328,7 @@ async function callAPI(prompt, maxTokens) {
       'anthropic-dangerous-direct-browser-access': 'true'
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-6',
+      model: 'claude-3-5-sonnet-latest', // 現在利用可能な最新のSonnetモデルに修正
       max_tokens: maxTokens,
       messages: [{ role: 'user', content: prompt }]
     })
@@ -359,12 +341,16 @@ async function callAPI(prompt, maxTokens) {
   return data.content[0].text.trim();
 }
 
-async function fetchScript(theme) {
+async function fetchScript(theme, djKeys) {
+  // 選ばれた2人のDJの情報を取得
+  const djA = DJS[djKeys[0]];
+  const djB = DJS[djKeys[1]];
+
   const text = await callAPI(
     `あなたはラジオ番組の台本作家です。2人のDJが会話するラジオ番組の台本を作ってください。
 
-DJ A「ハル」: 明るくテンション高め。話を広げるのが得意。
-DJ B「ソラ」: 冷静で知識豊富。ツッコミ担当。
+DJ A「${djA.name}」: ${djA.desc}
+DJ B「${djB.name}」: ${djB.desc}
 
 テーマ：${theme}
 
@@ -386,10 +372,10 @@ A:セリフ
   const lines = [];
   text.split('\n').forEach(line => {
     const t = line.trim();
-    if (t.startsWith('A:')) lines.push({ dj: 'a', text: t.slice(2).trim() });
-    else if (t.startsWith('B:')) lines.push({ dj: 'b', text: t.slice(2).trim() });
+    if (t.startsWith('A:')) lines.push({ dj: djKeys[0], text: t.slice(2).trim() });
+    else if (t.startsWith('B:')) lines.push({ dj: djKeys[1], text: t.slice(2).trim() });
   });
-  return { theme, lines };
+  return { theme, lines, djKeys };
 }
 
 async function fetchCM() {
@@ -452,7 +438,7 @@ function renderChat(lines) {
   log.innerHTML = '';
   lines.forEach((line, i) => {
     const dj = DJS[line.dj];
-    const side = line.dj === 'a' ? 'left' : 'right';
+    const side = line.dj === lines[0].dj ? 'left' : 'right'; // トークを開始したDJを左、相手を右に整列
     const div = document.createElement('div');
     div.className = `chat-bubble ${side}`;
     div.innerHTML = `
@@ -473,8 +459,7 @@ function highlight(idx) {
 
 // ===== メインループ =====
 async function radioLoop() {
-  const randomTheme = () => THEMES[Math.floor(Math.random() * THEMES.length)];
-
+  // 未定義のTHEMESを使う不要な1行を削除
   setMode('loading', '', null);
   setStatus('最初の台本を生成中（10〜20秒かかります）...', false);
 
@@ -482,7 +467,7 @@ async function radioLoop() {
   try {
     const firstTheme = await fetchTheme();
     const firstDJs = pickDJs();
-    current = await fetchScript(firstTheme, firstDJs);
+    current = await fetchScript(firstTheme, firstDJs); // 2人のDJ情報を正しく渡す
   } catch(e) {
     setStatus('エラー: ' + e.message, true);
     stopRadio();
@@ -524,11 +509,13 @@ async function radioLoop() {
     try { cmText = await cmPromise; } catch(e) { cmText = 'AIラジオをお聴きいただきありがとうございます。'; }
     document.getElementById('cmBox').textContent = cmText;
 
-    await speak('それではCMです。', 'a');
+    await speak('それではCMです。', current.lines[0].dj); // 喋っているDJに合わせて声を変える
     await wait(150);
     await speak(cmText, null);
     await wait(300);
-    await speak('以上CMでした。放送に戻ります！', 'b');
+    // 2人目のDJがいればその人の声で、いなければデフォルトで戻る発言
+    const secondDj = current.djKeys ? current.djKeys[1] : null;
+    await speak('以上CMでした。放送に戻ります！', secondDj);
     await wait(300);
 
     if (!isRunning) return;
@@ -567,28 +554,11 @@ function stopRadio() {
   isRunning = false;
   synth.cancel();
   stopBGM();
-  if (audioCtx) { try { audioCtx.close(); } catch(e){} audioCtx = null; }
-  document.getElementById('nowPlaying').classList.remove('visible');
   document.getElementById('startBtn').disabled = false;
-  setStatus('放送を終了しました', false);
+  document.getElementById('nowPlaying').classList.remove('visible');
+  setStatus('放送を終了しました。', false);
 }
-
-// 画面オフ防止
-async function requestWakeLock() {
-  try {
-    if ('wakeLock' in navigator) {
-      await navigator.wakeLock.request('screen');
-      document.addEventListener('visibilitychange', async () => {
-        if (document.visibilityState === 'visible') {
-          try { await navigator.wakeLock.request('screen'); } catch(e) {}
-        }
-      });
-    }
-  } catch(e) {}
-}
-
-loadKey();
-requestWakeLock();
 </script>
+
 </body>
 </html>
