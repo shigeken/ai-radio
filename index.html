@@ -339,7 +339,7 @@ DJ B「${DJS[keyB].name}」: ${DJS[keyB].desc}
 【出力形式のみ】
 A:セリフ
 B:セリフ
-...`, 4096);
+...`, 8192);
 
   const lines = [];
   raw.split('\n').forEach(line => {
@@ -378,7 +378,13 @@ function startTimer(seconds) {
   box.classList.add('visible');
   let remaining = seconds;
   const update = () => {
-    if (remaining < 0) { clearInterval(timerInterval); box.textContent = '⏰ お便り締め切りました'; return; }
+    if (remaining < 0) {
+      clearInterval(timerInterval);
+      box.textContent = '⏰ お便り締め切りました';
+      document.getElementById('sendBtn').disabled = true;
+      document.getElementById('letterInput').disabled = true;
+      return;
+    }
     const m = Math.floor(remaining / 60), s = remaining % 60;
     box.textContent = `⏰ お便り締め切りまで ${m}:${String(s).padStart(2,'0')}`;
     remaining--;
@@ -397,6 +403,7 @@ function stopTimer() {
 function showLetterBox(theme) {
   document.getElementById('nextThemeLabel').textContent = '📌 次のテーマ：' + theme;
   document.getElementById('letterInput').value = '';
+  document.getElementById('letterInput').disabled = false;
   document.getElementById('letterSent').style.display = 'none';
   document.getElementById('sendBtn').disabled = false;
   document.getElementById('letterBox').classList.add('visible');
@@ -455,12 +462,11 @@ async function radioLoop() {
   await speak('AIラジオへようこそ。ただいま番組を準備中です。しばらくお待ちください。', null);
   await wait(200);
 
-  // 最初のテーマ・DJ・次のテーマを並行取得
-  const firstTheme = await fetchTheme();
+  // テーマ2つを並行取得
+  const [firstTheme, nextTheme0] = await Promise.all([fetchTheme(), fetchTheme()]);
   const firstDJs = pickDJs(null);
-  const nextThemePromise = fetchTheme(); // 次のテーマも先取り
   let current = await fetchScript(firstTheme, firstDJs[0], firstDJs[1], null);
-  let nextTheme = await nextThemePromise;
+  let nextTheme = nextTheme0;
   showLoading(false);
 
   let prevDJs = firstDJs;
