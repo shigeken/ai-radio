@@ -475,3 +475,72 @@ async function radioLoop() {
       nextPromise = fetchScript(nextTheme, keyA, keyB, letter)
         .catch(() => fetchScript(nextTheme, keyA, keyB, null));
     }
+
+    const cmText = await fetchCM().catch(() => 'AIラジオをお聴きいただきありがとうございます。');
+    await speak('それではCMです。', current.keyA);
+    await wait(150);
+    await speak(cmText, null);
+    await wait(300);
+    await speak('以上CMでした。放送に戻ります。', current.keyB);
+    await wait(300);
+    if (!isRunning) return;
+
+    // 台本を待つ（間に合わなければCM延長）
+    let resolved = false;
+    nextPromise.then(() => { resolved = true; });
+    await wait(300);
+    if (!resolved) {
+      showLoading(true);
+      await speak('ただいま次の番組を準備中です。もうしばらくお待ちください。', null);
+    }
+
+    try { current = await nextPromise; } catch(e) { setStatus('エラー: ' + e.message, true); stopRadio(); return; }
+    showLoading(false);
+  }
+}
+
+// ===== 開始・終了 =====
+async function startRadio() {
+  const apiKey = getApiKey();
+  if (!apiKey) { setStatus('APIキーを入力してください', true); return; }
+  try {
+    if (document.getElementById('saveKey')?.checked) {
+      localStorage.setItem('ai_radio_key', apiKey);
+      document.getElementById('keySavedBanner').style.display = 'flex';
+      document.getElementById('keyInputArea').style.display = 'none';
+    }
+  } catch(e) {}
+  isRunning = true;
+  document.getElementById('startBtn').disabled = true;
+  document.getElementById('nowPlaying').classList.add('visible');
+  await radioLoop();
+}
+
+function stopRadio() {
+  isRunning = false;
+  usedThemes = []; pendingLetter = null;
+  synth.cancel(); stopBGM(); stopTimer(); showLoading(false); hideLetterBox();
+  if (audioCtx) { try { audioCtx.close(); } catch(e){} audioCtx = null; }
+  document.getElementById('nowPlaying').classList.remove('visible');
+  document.getElementById('startBtn').disabled = false;
+  setStatus('放送を終了しました', false);
+}
+
+// 画面オフ防止
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      await navigator.wakeLock.request('screen');
+      document.addEventListener('visibilitychange', async () => {
+        if (document.visibilityState === 'visible')
+          try { await navigator.wakeLock.request('screen'); } catch(e) {}
+      });
+    }
+  } catch(e) {}
+}
+
+loadKey();
+requestWakeLock();
+</script>
+</body>
+</html>
