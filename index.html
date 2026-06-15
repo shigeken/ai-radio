@@ -440,7 +440,7 @@ async function fetchPart(partNum, show, keyA, keyB, theme, letter, nextShowInfo)
     2: `【パート2：メイントーク（約4分）】
 - ${show.isOgiri ? `お題「${theme}」について以下のスタイルで大喜利を進める：
   DJ A「${DJS[keyA].name}」：短くキレのある直感的なボケ。意外性とギャップを重視。1文以内。
-  DJ B「${DJS[keyB].name}」：ナゾカケ形式。一見お題と無関係に見えて実は繋がっている知的なボケ。「〇〇とかけて△△と解く、その心は〜」の構造を短く。1文以内。
+  DJ B「${DJS[keyB].name}」：知性を感じる視点のボケ。お題を別の角度から見て「確かにそういう見方もある」と思わせる一言。長くなりすぎず1〜2文以内。
   「なるほどそういうことですか」「それは困りますね」のような無難な相槌は絶対にしない。
   聴いた人が思わずつっこみたくなる回答を目指す。
   テンポよくボケとツッコミを繰り返して盛り上げる。` : `テーマ「${theme}」を深掘りしてトークする`}
@@ -606,23 +606,21 @@ async function radioLoop() {
     showLetterBox(curTheme);
     pendingLetter = null;
 
-    // パート1読み上げ＆終了後にお便り締め切り→パート2生成
+    // パート1読み上げ
     let curLetter = null;
     await speakLines(part1);
     if (!isRunning) return;
     hideLetterBox();
-
-    // パート1終了と同時にdecideLetter＆part2を並行開始
-    const [letterResult, part2] = await Promise.all([
-      decideLetter(curTheme, cur.keyA, cur.keyB),
-      safeFetch(() => fetchPart(2, cur.show, cur.keyA, cur.keyB, curTheme, null, null))
-    ]);
-    curLetter = letterResult;
     pendingLetter = null;
-    if (!isRunning) return;
 
-    // CM1
+    // CM1（この間にdecideLetter＋パート2を生成）
+    const part2Promise = (async () => {
+      curLetter = await decideLetter(curTheme, cur.keyA, cur.keyB);
+      return fetchPart(2, cur.show, cur.keyA, cur.keyB, curTheme, curLetter, null);
+    })();
     await playCM(cur.keyA, cur.keyB);
+    const part2 = await safeFetch(() => part2Promise);
+    if (!isRunning) return;
     if (!isRunning) return;
 
     // --- パート2 ---
