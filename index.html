@@ -272,13 +272,29 @@ async function callAPI(prompt, maxTokens) {
 }
 
 // ===== コンテンツ生成 =====
+const THEME_GENRES = [
+  '食べ物・グルメ','旅行・観光','恋愛・人間関係','スポーツ・健康',
+  '音楽・エンタメ','お金・生活','自然・動物','歴史・文化',
+  '家族・子育て','趣味・ホビー','季節・行事','学校・仕事',
+  'ファッション・美容','乗り物・移動','住まい・インテリア'
+];
+let lastGenreIdx = -1;
+
 async function fetchTheme() {
   const useNews = Math.random() < 0.3;
   const exclusion = usedThemes.length > 0
     ? '\n\n【使用済みなので絶対に除外】\n' + usedThemes.map((t, i) => `${i+1}. ${t}`).join('\n') : '';
-  const base = useNews
-    ? 'あなたはラジオ番組のプロデューサーです。最近の日本や世界のニュース・トレンドを踏まえて、ラジオトークのテーマを1つ考えてください。'
-    : 'あなたはラジオ番組のプロデューサーです。リスナーが楽しめる面白いラジオトークのテーマを1つ考えてください。日常・文化・雑学・人生・トレンドなど何でもOK。';
+
+  let base;
+  if (useNews) {
+    base = 'あなたはラジオ番組のプロデューサーです。最近の日本や世界のニュース・トレンドを踏まえて、ラジオトークのテーマを1つ考えてください。AIやテクノロジー以外のジャンルで。';
+  } else {
+    let idx;
+    do { idx = Math.floor(Math.random() * THEME_GENRES.length); } while (idx === lastGenreIdx);
+    lastGenreIdx = idx;
+    base = `あなたはラジオ番組のプロデューサーです。「${THEME_GENRES[idx]}」に関連する面白いラジオトークのテーマを1つ考えてください。`;
+  }
+
   const theme = await callAPI(base + 'テーマの文章のみ出力（例：○○について）。説明不要。' + exclusion, 100);
   usedThemes.push(theme);
   if (usedThemes.length > 20) usedThemes.shift();
