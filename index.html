@@ -386,18 +386,23 @@ async function decideLetter(theme, keyA, keyB) {
 
 async function fetchPart(partNum, show, keyA, keyB, theme, letter, nextShowInfo) {
   const nowCtx = getNowContext();
-  const savedMemory = showMemory[[keyA,keyB].sort().join('')];
+  const mem = showMemory[[keyA,keyB].sort().join('')];
   const letterSection = letter
     ? `\n\n【リスナーからのお便り】\nラジオネーム「${letter.name}」さんからのお便りです。トークの途中で自然に読み上げて返答してください。\n「${letter.text}」` : '';
-  const reviewSection = savedReview
-    ? `\n\n【前回放送の感想】\n${savedReview}\n感想を紹介する際は誰が書いたかは言わず内容だけ紹介してください。` : '';
+  const reviewSection = mem ? `
+
+【前回放送の記録】
+テーマ：${mem.theme}
+前回の内容：${mem.episode}${mem.listenerName ? `
+前回読まれたお便り（${mem.listenerName}さん）：${mem.listenerText}` : ''}
+前回の内容とお便りを自然な流れで紹介してください。` : '';
 
   const instructions = {
     1: `【パート1：オープニング（約4分）】
 - 番組名「${show.name}」と出演DJを紹介する
 - 時間帯や季節を自然に組み込む
 - ${show.isOgiri ? `大喜利のお題「${theme}」を発表する` : `今日のテーマ「${theme}」をさらっと紹介するだけにとどめる。テーマの深掘りはパート2で行うため、パート1では深く触れない`}
-- リスナーにお便りを募集する${savedReview ? `\n- 前回の感想を自然な流れで紹介する${reviewSection}` : ''}`,
+- リスナーにお便りを募集する${mem ? `\n- 前回の放送内容とお便りを自然な流れで紹介する${reviewSection}` : ''}`,
 
     2: `【パート2：メイントーク（約4分）】
 - ${show.isOgiri ? `お題「${theme}」について以下のスタイルで大喜利を進める：
@@ -549,12 +554,16 @@ async function radioLoop() {
   document.getElementById('currentTheme').textContent = 'まもなく放送開始...';
   showLoading(true);
 
-  await speak('AIラジオへようこそ。ただいま番組を準備中です。しばらくお待ちください。', null);
-
-  // 最初の番組を準備
+  // 読み上げと台本生成を並行
   let cur = nextSchedule();
-  let curTheme = await fetchTheme(cur.show);
-  let part1 = await safeFetch(() => fetchPart(1, cur.show, cur.keyA, cur.keyB, curTheme, null, null));
+  let curTheme = '';
+  const preparePromise = (async () => {
+    curTheme = await fetchTheme(cur.show);
+    return safeFetch(() => fetchPart(1, cur.show, cur.keyA, cur.keyB, curTheme, null, null));
+  })();
+
+  await speak('AIラジオへようこそ。ただいま番組を準備中です。しばらくお待ちください。', null);
+  let part1 = await preparePromise;
   showLoading(false);
 
   while (isRunning) {
@@ -564,18 +573,18 @@ async function radioLoop() {
     showLetterBox(curTheme);
     pendingLetter = null;
 
-    // パート1読み上げ中にパート2台本を生成（パート1終了後に締め切り）
+    // パート1読み上げ（終了後にお便り締め切り→パート2生成）
     let curLetter = null;
     const part2Promise = speakLines(part1).then(async () => {
+      if (!isRunning) return null;
+      hideLetterBox();
       curLetter = await decideLetter(curTheme, cur.keyA, cur.keyB);
       pendingLetter = null;
       return fetchPart(2, cur.show, cur.keyA, cur.keyB, curTheme, curLetter, null);
     });
 
-    // part2Promiseの中でspeakLines(part1)を実行するので、ここでは待つだけ
     const part2 = await safeFetch(() => part2Promise);
     if (!isRunning) return;
-    hideLetterBox();
 
     // CM1
     await playCM(cur.keyA, cur.keyB);
@@ -609,10 +618,16 @@ async function radioLoop() {
     // パート3読み上げ中に次番組パート1とshowMemoryを並行生成
     const nextPart1Promise = safeFetch(() => fetchPart(1, next.show, next.keyA, next.keyB, nextTheme, null, null));
     const memKey = [cur.keyA, cur.keyB].sort().join('');
-    const memPromise = Promise.all([
-      callAPI(`ラジオ番組「${cur.show.name}」のトーク（テーマ：${curTheme}）で話されたエピソードや印象的な話題を2〜3文で要約してください。要約のみ出力。`, 200).catch(() => null),
-    ]).then(([episode]) => {
-      if (episode) showMemory[memKey] = { episode, letter: curLetter?.text || null };
+    const transcript = [...part1, ...part2, ...part3].map(l => l.text).join('\n');
+    const memPromise = callAPI(
+      `以下はラジオ番組「${cur.show.name}」（テーマ：${curTheme}）の台本です。\n${transcript}\n\nこの放送で話されたエピソードや印象的な話題を2〜3文で要約してください。要約のみ出力。`, 200
+    ).catch(() => null).then(episode => {
+      if (episode) showMemory[memKey] = {
+        theme: curTheme,
+        episode,
+        listenerName: curLetter?.name || null,
+        listenerText: curLetter?.text || null
+      };
     });
 
     await speakLines(part3);
