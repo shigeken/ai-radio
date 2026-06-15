@@ -159,7 +159,6 @@
 </div>
 
 <script>
-// ===== DJ定義 =====
 const DJS = {
   a: { name:'ハル',     emoji:'😄', pitch:1.5,  rate:1.1,  desc:'24歳、神奈川出身のカフェ店員（休日はラジオDJ）。テンション高めでポジティブ、天真爛漫。「それ最高じゃないですか」「えーほんとに」が口癖。タメ口気味で語尾が上がる。インスタ映えスポット巡りや韓国ドラマが好き。数字と難しい話と朝が苦手。' },
   b: { name:'ソラ',     emoji:'🤓', pitch:0.8,  rate:0.9,  desc:'43歳、京都出身のITエンジニア中堅社員（副業でラジオDJ）。冷静で知識豊富、少し皮肉屋。「それは違くて」「実はですね」が口癖。丁寧語ベースでたまに早口、ツッコミが鋭い。読書やプログラミングや将棋が好き。感情論と体育会系ノリが苦手。' },
@@ -169,12 +168,12 @@ const DJS = {
 
 // ===== 番組定義（DJ組み合わせごと）=====
 const SHOWS = {
-  'ab': { name:'ラジオホリデー',   regular: { name:'布団の中から失礼します', desc:'30代会社員。毎回眠そうなコメントを送ってくる常連。' } },
-  'ac': { name:'キラキラFM',       regular: { name:'地元のギャルより',       desc:'ナナに憧れる中学生。トレンドの報告をしてくる常連。' } },
-  'ad': { name:'朝どれラジオ',     regular: { name:'カフェの常連おじさん',   desc:'ハルの職場の常連客。毎回注文を報告してくる常連。' } },
-  'bc': { name:'ギークナイト',     regular: { name:'プログラミング勉強中',   desc:'文系大学生。ソラに質問を投げかけてくる常連。' } },
-  'bd': { name:'男の隠れ家',       regular: { name:'競馬場帰りのサラリーマン', desc:'ジョージと馬の話をしたがる常連。' } },
-  'cd': { name:'世代間ラジオ',     regular: { name:'ジョージのことが心配なお嫁さん', desc:'ジョージの昭和発言にツッコミを入れてくる常連。' } }
+  'ab': { name:'大喜利ファイト',   genres:['大喜利'], regular: { name:'大喜利に命をかけるサラリーマン', desc:'毎回本気の大喜利回答を送ってくる常連。ボケの精度が高い。' }, isOgiri: true },
+  'ac': { name:'キラキラFM',       genres:['トレンド','スイーツ','ファッション','韓国文化','SNS'], regular: { name:'地元のギャルより', desc:'ナナに憧れる中学生。トレンドの報告をしてくる常連。' } },
+  'ad': { name:'朝どれラジオ',     genres:['日常','季節','地元話','人情','食文化'], regular: { name:'カフェの常連おじさん', desc:'ハルの職場の常連客。毎回注文を報告してくる常連。' } },
+  'bc': { name:'ギークナイト',     genres:['テクノロジー','ゲーム','学校','将来','サブカル'], regular: { name:'プログラミング勉強中', desc:'文系大学生。ソラに質問を投げかけてくる常連。' } },
+  'bd': { name:'男の隠れ家',       genres:['仕事','お金','スポーツ','昭和文化','趣味'], regular: { name:'競馬場帰りのサラリーマン', desc:'ジョージと馬の話をしたがる常連。' } },
+  'cd': { name:'世代間ラジオ',     genres:['ジェネレーションギャップ','家族','価値観','流行の変化'], regular: { name:'ジョージのことが心配なお嫁さん', desc:'ジョージの昭和発言にツッコミを入れてくる常連。' } }
 };
 
 function getShow(keyA, keyB) {
@@ -197,7 +196,6 @@ const THEME_GENRES = [
   'ファッション・美容','乗り物・移動','住まい・インテリア'
 ];
 
-// ===== 状態 =====
 let isRunning = false;
 let usedThemes = [];
 let pendingLetter = null;
@@ -210,7 +208,6 @@ let bgmOn = false;
 let lastBgmIdx = -1;
 let lastGenreIdx = -1;
 let prevDJs = null;
-// 番組ごとの前回トーク要約を保存
 const showMemory = {};
 let synth = window.speechSynthesis;
 let voices = [];
@@ -219,7 +216,6 @@ function loadVoices() { voices = synth.getVoices().filter(v => v.lang.startsWith
 loadVoices();
 if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = loadVoices;
 
-// ===== APIキー =====
 function loadKey() {
   try {
     if (localStorage.getItem('ai_radio_key')) {
@@ -238,7 +234,6 @@ function getApiKey() {
   return document.getElementById('apiKey').value.trim();
 }
 
-// ===== BGM =====
 function pickBgm() {
   let idx;
   do { idx = Math.floor(Math.random() * BGM_PATTERNS.length); } while (idx === lastBgmIdx);
@@ -283,7 +278,6 @@ function setBgmUI(on) {
   document.getElementById('bgmLabel').textContent = on ? 'BGM 再生中' : 'BGM 停止中';
 }
 
-// ===== API =====
 async function callAPI(prompt, maxTokens) {
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -299,7 +293,6 @@ async function callAPI(prompt, maxTokens) {
   return (await res.json()).content[0].text.trim();
 }
 
-// ===== 現在の季節・時間を取得 =====
 function getNowContext() {
   const now = new Date();
   const month = now.getMonth() + 1;
@@ -309,23 +302,31 @@ function getNowContext() {
   return `現在は${season}の${timeOfDay}（${hour}時台）`;
 }
 
-// ===== テーマ生成 =====
-async function fetchTheme() {
-  const useNews = Math.random() < 0.3;
+async function fetchTheme(show) {
   const exclusion = usedThemes.length > 0
     ? '\n\n【使用済みなので絶対に除外】\n' + usedThemes.map((t, i) => `${i+1}. ${t}`).join('\n') : '';
   let base;
-  if (useNews) {
-    base = 'あなたはラジオ番組のプロデューサーです。最近の日本や世界のニュース・トレンドを踏まえて、ラジオトークのテーマを1つ考えてください。AIやテクノロジー以外のジャンルで。';
+  if (show && show.isOgiri) {
+    // 大喜利ファイトはお題を生成
+    base = 'あなたは大喜利の司会者です。面白い大喜利のお題を1つ考えてください。例：「こんな〇〇は嫌だ」「〇〇が○○だったら」など。お題のみ出力。説明不要。';
+  } else if (show && show.genres) {
+    // 番組ごとのジャンルからランダムに選ぶ
+    const genre = show.genres[Math.floor(Math.random() * show.genres.length)];
+    base = `あなたはラジオ番組のプロデューサーです。「${genre}」に関連する面白いラジオトークのテーマを1つ考えてください。`;
   } else {
-    let idx;
-    do { idx = Math.floor(Math.random() * THEME_GENRES.length); } while (idx === lastGenreIdx);
-    lastGenreIdx = idx;
-    base = `あなたはラジオ番組のプロデューサーです。「${THEME_GENRES[idx]}」に関連する面白いラジオトークのテーマを1つ考えてください。`;
+    const useNews = Math.random() < 0.3;
+    if (useNews) {
+      base = 'あなたはラジオ番組のプロデューサーです。最近の日本や世界のニュース・トレンドを踏まえて、ラジオトークのテーマを1つ考えてください。AIやテクノロジー以外のジャンルで。';
+    } else {
+      let idx;
+      do { idx = Math.floor(Math.random() * THEME_GENRES.length); } while (idx === lastGenreIdx);
+      lastGenreIdx = idx;
+      base = `あなたはラジオ番組のプロデューサーです。「${THEME_GENRES[idx]}」に関連する面白いラジオトークのテーマを1つ考えてください。`;
+    }
   }
-  const theme = await callAPI(base + 'テーマの文章のみ出力（例：○○について）。説明不要。' + exclusion, 100);
+  const theme = await callAPI(base + (show && show.isOgiri ? '' : 'テーマの文章のみ出力（例：○○について）。説明不要。') + exclusion, 100);
   usedThemes.push(theme);
-  if (usedThemes.length > 20) usedThemes.shift();
+  if (usedThemes.length > 10) usedThemes.shift();
   return theme;
 }
 
@@ -341,7 +342,6 @@ function pickDJs(prev) {
   return pair;
 }
 
-// ===== お便り決定 =====
 async function decideLetter(theme, keyA, keyB, userLetter) {
   const show = getShow(keyA, keyB);
   const roll = Math.random();
@@ -356,9 +356,10 @@ async function decideLetter(theme, keyA, keyB, userLetter) {
 
   // 30%: 常連リスナー
   if (roll < 0.8) {
-    const text = await callAPI(
-      `ラジオ番組「${show.name}」の常連リスナー「${show.regular.name}」（${show.regular.desc}）が「${theme}」というテーマに関してお便りを送りました。そのキャラクターらしい1〜2文のお便りを作ってください。お便り文のみ出力。`, 150
-    ).catch(() => null);
+    const regularPrompt = show.isOgiri
+      ? `大喜利番組の常連リスナー「${show.regular.name}」（${show.regular.desc}）がお題「${theme}」に対して大喜利の回答を送りました。そのキャラクターらしい面白い回答を1文で作ってください。回答のみ出力。`
+      : `ラジオ番組「${show.name}」の常連リスナー「${show.regular.name}」（${show.regular.desc}）が「${theme}」というテーマに関してお便りを送りました。そのキャラクターらしい1〜2文のお便りを作ってください。お便り文のみ出力。`;
+    const text = await callAPI(regularPrompt, 150).catch(() => null);
     if (text) return { text, name: show.regular.name };
   }
 
@@ -374,7 +375,6 @@ async function decideLetter(theme, keyA, keyB, userLetter) {
   return null;
 }
 
-// ===== 台本生成 =====
 async function fetchScript(theme, keyA, keyB, userLetter) {
   const show = getShow(keyA, keyB);
   const key = [keyA, keyB].sort().join('');
@@ -384,8 +384,31 @@ async function fetchScript(theme, keyA, keyB, userLetter) {
   const letterSection = letter
     ? `\n\n【リスナーからのお便り】\nラジオネーム「${letter.name}」さんからのお便りです。トークの途中で自然に読み上げて返答してください。\n「${letter.text}」` : '';
 
-  const raw = await callAPI(
-    `あなたはラジオ番組「${show.name}」の台本作家です。
+  const isOgiri = show.isOgiri;
+  const prompt = isOgiri
+    ? `あなたはラジオ番組「大喜利ファイト」の台本作家です。
+
+DJ A「${DJS[keyA].name}」: ${DJS[keyA].desc}
+DJ B「${DJS[keyB].name}」: ${DJS[keyB].desc}
+
+大喜利のお題：${theme}
+時間帯：${nowCtx}${memory}${letterSection}
+
+【ルール】
+- 30〜35回のやり取り（約10分分）
+- 冒頭で番組名と大喜利のお題を紹介する
+- DJたちがお題に対して面白い回答を出し合い、ツッコミ・採点・盛り上げる
+- リスナーのお便りがあれば大喜利の回答として読み上げ、DJがリアクションする
+- テンポよく笑いを重ねて最後は自然な締めで終わる
+- 漢字はすべてひらがなに変換する
+- AI・DJ・SNS・TVなどのアルファベット略語はそのまま使う
+- 笑・！・？・（笑）などの記号は使わない
+
+【出力形式のみ】
+A:セリフ
+B:セリフ
+...`
+    : `あなたはラジオ番組「${show.name}」の台本作家です。
 
 DJ A「${DJS[keyA].name}」: ${DJS[keyA].desc}
 DJ B「${DJS[keyB].name}」: ${DJS[keyB].desc}
@@ -407,7 +430,8 @@ DJ B「${DJS[keyB].name}」: ${DJS[keyB].desc}
 【出力形式のみ】
 A:セリフ
 B:セリフ
-...`, 8192);
+...`;
+  const raw = await callAPI(prompt, 8192);
 
   const lines = [];
   raw.split('\n').forEach(line => {
@@ -418,7 +442,6 @@ B:セリフ
   return { theme, lines, keyA, keyB, show };
 }
 
-// ===== トーク要約を保存 =====
 async function saveMemory(script) {
   const key = [script.keyA, script.keyB].sort().join('');
   const sample = script.lines.slice(0, 10).map(l => `${DJS[l.djKey].name}：${l.text}`).join('\n');
@@ -435,7 +458,6 @@ async function fetchCM() {
   );
 }
 
-// ===== 読み上げ =====
 function speak(text, djKey) {
   return new Promise(resolve => {
     const dj = djKey ? DJS[djKey] : { pitch:1.0, rate:1.0 };
@@ -449,7 +471,6 @@ function speak(text, djKey) {
 
 function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-// ===== タイマー =====
 function startTimer(seconds) {
   clearInterval(timerInterval);
   const box = document.getElementById('timerBox');
@@ -477,7 +498,6 @@ function stopTimer() {
   document.getElementById('timerBox').classList.remove('visible');
 }
 
-// ===== お便り =====
 function showLetterBox(nextScript) {
   const info = `📻 ${nextScript.show.name}\n📌 ${nextScript.theme}`;
   document.getElementById('nextInfo').textContent = info;
@@ -500,7 +520,6 @@ function sendLetter() {
   document.getElementById('letterSent').style.display = 'block';
 }
 
-// ===== UI =====
 function showLoading(show) {
   document.getElementById('loadingIndicator').classList.toggle('visible', show);
 }
@@ -534,7 +553,6 @@ function setMode(mode, data) {
   }
 }
 
-// ===== メインループ =====
 async function radioLoop() {
   setMode('loading', null);
   document.getElementById('currentTheme').textContent = 'まもなく放送開始...';
@@ -544,7 +562,8 @@ async function radioLoop() {
   await wait(200);
 
   const firstDJs = pickDJs(null);
-  const [firstTheme, nextTheme0] = await Promise.all([fetchTheme(), fetchTheme()]);
+  const firstShow = getShow(firstDJs[0], firstDJs[1]);
+  const [firstTheme, nextTheme0] = await Promise.all([fetchTheme(firstShow), fetchTheme(null)]);
   let current = await fetchScript(firstTheme, firstDJs[0], firstDJs[1], null);
   let nextTheme = nextTheme0;
   showLoading(false);
@@ -621,17 +640,28 @@ async function radioLoop() {
         showLoading(true);
         await speak('ただいま次の番組を準備中です。もうしばらくお待ちください。', null);
       }
-      try { next = await nextPromise; } catch(e) { setStatus('エラー: ' + e.message, true); stopRadio(); return; }
+      try {
+        next = await nextPromise;
+      } catch(e) {
+        // 失敗したら新しいテーマで再試行
+        try {
+          const retryTheme = await fetchTheme();
+          const [rA, rB] = pickDJs(prevDJs);
+          next = await fetchScript(retryTheme, rA, rB, null);
+        } catch(e2) {
+          setStatus('エラー: 再試行も失敗しました', true);
+          stopRadio(); return;
+        }
+      }
       showLoading(false);
     }
 
     prevDJs = [next.keyA, next.keyB];
     current = next;
-    nextTheme = await fetchTheme().catch(() => fetchTheme());
+    nextTheme = await fetchTheme(getShow(next.keyA, next.keyB)).catch(() => fetchTheme(null));
   }
 }
 
-// ===== 開始・終了 =====
 async function startRadio() {
   const apiKey = getApiKey();
   if (!apiKey) { setStatus('APIキーを入力してください', true); return; }
